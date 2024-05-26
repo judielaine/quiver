@@ -1,0 +1,45 @@
+/'Quiver diagram common colors
+
+Created: 2024/05/26 07:13:49
+Last modified: 2024/05/26 07:53:20
+
+For citations and other documentation, please see 
+[Zotero group library](https://www.zotero.org/groups/5541646/nextgencredentials)
+'/
+@startuml colors
+    ' https://color.adobe.com/create/color-wheel adobe@gcc
+    ' AdobeColor-internet2colorsA.jpeg
+    
+    !define pBlue  #0388A6
+    !define pBlack #0A2A61
+    !define pPale #E0E3DF
+    !define pLtBlue #60BEC5    
+    !define pDKGreen #589845
+    !define pOrange #D94929
+    !define pNote #F5F3CC
+    !define pRed #D92B2B
+
+    skinparam{
+        'https://plantuml.com/skinparam
+        'https://plantuml-documentation.readthedocs.io/en/latest/formatting/all-skin-params.html
+    
+        ArrowColor pBlack
+        ArrowFontColor pBlack
+
+        'backgroundColor transparent Don't do this because of night mode
+
+        ClassBackgroundColor pPale
+        classFontColor pBlack
+        'classFontSize 10
+        'classFontName Aapex
+        
+        HyperlinkColor pRed
+
+        NoteBackgroundColor pNote
+        NoteBorderColor pDKGreen
+        NoteFontColor pBlack
+
+        TitleFontColor pBlack
+    }
+
+@enduml
