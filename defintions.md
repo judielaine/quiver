@@ -5,11 +5,11 @@
 Define a **home institution** as either
 
 * an academic or research institution that does
-proofing of an identity and issues an identifier; or 
+proofing of an identity and issues an identifier; or
 * an institution that uses
 a national credential.
 
-Define a **virtual organization** as a R&E function that maintains some attributes about 
+Define a **virtual organization** as a R&E function that maintains some attributes about
 and has access control requirements for  members of academia and optionally independent researchers.
 
 Define a **bridge member** as a home institution or VO that allows a bridge to issue R&E credentials of various types on its behalf.
@@ -40,7 +40,7 @@ MUST have long-lived, non-reassignable, omni-directional identifier suitable for
 
 * Note that the name and description of the credential appear to be released to the verifier, so if the point is to prevent the verifier from knowing that the user is attempting access based on their relationship with institution X, the name of the credential shouldn't be "Insitution X Access."
 
-[ ] Presumably users might want  combined access credentials? The bridge supports three of my home or virtual organizations -- i don't care about releasing all three affiliations if it means i can get access faster. 
+[ ] Presumably users might want  combined access credentials? The bridge supports three of my home or virtual organizations -- i don't care about releasing all three affiliations if it means i can get access faster.
 
 ## APIs
 
