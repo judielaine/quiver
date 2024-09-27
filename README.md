@@ -19,22 +19,26 @@ This model posits a role for "bridge" issuers. The bridge issuers may
 
 A trust network is needed to verify that a bridge is authorized to represent specific originating issuer, and to facilitate the back channel OAuth network.
 
-## Table of contents
-
-* [Definitions](./defintions.md)
-* [Provisioning](./provisioning.md)
-
 ## Initial overview
 
-Assume a principal has a some to-be-defined ["R&E standard credentials"](./defintions.md#credentials) by their [home institution](./defintions.md#participants) including a correlatable identifier comparable to the [general purpose subject identifier](https://docs.oasis-open.org/security/saml-subject-id-attr/v1.0/cs01/saml-subject-id-attr-v1.0-cs01.html#_Toc536097226). The principal has used that credential at a [bridge issuer](./defintions.md#participants) to establish ["R&E bridge credentials"](./defintions.md#credentials). [Note](./defintions.md#home-institution-privacy)
+Assume a principal has a some to-be-defined ["R&E standard credentials"](./defintions.md#credentials) issued by their [home institution](./defintions.md#participants) that includes a correlatable identifier comparable to the [general purpose subject identifier](https://docs.oasis-open.org/security/saml-subject-id-attr/v1.0/cs01/saml-subject-id-attr-v1.0-cs01.html#_Toc536097226). The principal has used that credential at a [bridge issuer](./defintions.md#participants) to establish ["R&E bridge credentials"](./defintions.md#credentials). [\[Note\]](./defintions.md#home-institution-privacy)
+
+![Component diagram](./out/diagrams/20240923brainstorm/20240923dep.png)
+
+[See puml for diagram](./diagrams/20240923brainstorm.puml)
 
 The bridge credentials are very simple, identifying the bridge and a short lived identifier for the principal.
 
 When the principal attempts access at some resource that is constrained to provide access based on decisions of their home institution, the principal is prompted to present a bridge credential.
 
-On receipt of the bridge credential, in concert with the OpenID federation metadata, the verifier should be able to identify the bridge issuer's `OAuth authorization server` and the `OAuth protected resource` for requesting the token associated with the principal's temporary identifier from the bridge. [Note]
+On receipt of the bridge credential, in concert with the OpenID federation metadata, the verifier should be able to identify the bridge issuer's `OAuth authorization server` and the `OAuth protected resource` for requesting the token associated with the principal's temporary identifier from the bridge.
 
-When the bridge receives 
+When the bridge receives the API request it uses the temporary ID to  establish the home institution(s) and/or virtual organization(s) and the principal's identifier for the authorizing parties. It uses the verifier's client identifier to determine if any  home institution(s) and/or virtual organization(s) have an authorizing relationship with the verifier.  If any do, the bridge constructs the bridge document that contains whatever claims or scopes or groups needed to communicate the authorizing party's decisions with respect to the principal back to the verifier.
+
+## Other contents
+
+* [Definitions](./defintions.md)
+* [Provisioning](./provisioning.md)
 
 ## Quiver?
 
