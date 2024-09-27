@@ -1,0 +1,227 @@
+# Brainstorm
+
+Created: 2024/09/23 12:12:54
+Last modified: 2024/09/27 18:39:52
+
+@startuml 20240923seq
+!include ./versionString.puml
+!include ./color/color.puml
+!define lvc pDKGreen
+!define loauth pBlue
+!define ltrust pOrange
+
+'participant "Subject" as user
+participant "Wallet+\nClient" as holder
+participant "Resource" as verifier
+participant "Bridge\ntrust" as fed
+participant "Bridge\nservice" as issuer
+'participant "Virtual\ninstitution" as vo
+participant "Home\ninstitution" as inst
+note over holder, inst
+    end note
+== Provisioning flows ==
+note over holder, inst
+    Provisioning can occur a number of ways. The "VC + OAuth provisioning" flow assumes
+    the home institution has full new technology capabilities. The "Auth + dataload
+    provisioning" flow assumes minimal new technology capabilities at the home institution.
+    The "Independent researcher by email" flow sketches a low assurance identity 
+    provisioning. The "Independent researcher by credential" flow sketches a high assurance 
+    identity provisioning. 
+end note
+== Home institution derived credentials ==
+group VC + OAuth provisioning
+    ... Bridge provisions home institution access token ...
+    issuer -[loauth]> inst: CCG request access token
+    inst <-[ltrust]-> fed: verify OAuth client
+    inst   -[loauth]> issuer: access token
+    ... Principal provisions wallet from home institution...
+    holder <-[lvc]> inst: acquire R&E standard credentials (unique principal ID included)
+    ... Principal provisions wallet at bridge ...
+    holder -[lvc]> issuer: /CredentialRegistration
+    issuer -[lvc]> holder: request R&E standard credentials
+    [-[lvc]> holder: select one of\nmultiple  creds
+    holder -[lvc]> issuer: submit R&E standard credential
+    issuer --> issuer
+    note right 
+        Verify credential. 
+        Identify issuer minimally
+        from signature. 
+    end note
+    opt National R&E credential
+        issuer <-> holder: choose specific institution
+    end alt
+    opt Additional claims needed
+    issuer -[loauth]> inst: POST /attributes\nInstituion ID
+    note left 
+        If additional attributes needed,
+        eg: eduPersonScopedAffiliation, 
+        call a standard endpoint for
+        collecting those attributes.  
+
+        POST minimizes PII exposure.
+    end note
+    end alt
+
+else Auth + dataload provisioning
+    ... Institution configures bridge ...
+    [<-> issuer: via UI
+    note right
+        Institution admin provisions keys so
+        bridge can sign on behalf of the home
+        institution.
+
+        Institution admin configures access
+        policies. //Given a verifier, what// 
+        //scopes are provided based on which//
+        //group membership(s).//
+
+        TBD: what claims can an institution
+        issue in the access token? Cf library
+        statistics claim.
+    end note
+        ... Institution provisions bridge ...
+    inst  --> issuer
+    note left 
+        Institution loads principal 
+        identifiers, attributes, and groups 
+        or other access control attributes.
+    end note
+    ... Principal provisions wallet at bridge ...
+    holder <-> issuer: /FindMyInstitution\n(Discovery)
+    holder <- issuer: redirect or FedCM
+    holder <-> inst: authenticate
+    holder -> issuer: authN response token
+    issuer --> issuer
+    note right 
+        Verify authN response. 
+
+        Generate standard credential
+    end note
+
+    issuer -[lvc]> holder: "R&E standard credentials"
+end
+
+issuer --> issuer
+note right 
+    Determine blinded credentials
+    based on claims. Sign with 
+    bridge key.
+end note
+issuer <-> holder: prompt for optional Name and\nDescription to include in VC
+note right 
+    Posit holders may have multiple personas
+    where they may wish to present "Is student"
+    due to one institution relationship, but 
+    "Is staff" due to another. To select the 
+    right blinded credential, they need a way
+    to distinguish that is meaningful to them
+    and that they are comfortable revealing to
+    verifiers. (Since issuer is same for both,
+    issuer is not sufficient distinguishing value.)
+end note
+issuer -[lvc]> holder: "R&E blinded credentials"
+issuer --> issuer
+note right 
+    Generate //N// temporary IDs
+    for sequential time periods of
+    duration //T//.
+    Create credential for each time
+    period with ID and bridge 
+    endpoint
+
+end note
+
+== Independent researcher ==
+'col 92
+note over holder, inst
+    Assume that virtual organizations (research orgs, libraries) need to provide accounts
+    independent scholars. A bridge provider *may* offer the capability to provide a 
+    minimal independent scholar version of "R&E standard credentials" with an identifier
+    plus additional attributes such as name, email, residence. ORCID may be interested, 
+    but scope should include other cases such as  citizens who sign up for state univeristy 
+    access.
+
+    Assume there are different levels of assurance. 
+end note
+... Principal provisions wallet at bridge ...
+holder <-> issuer: /FindMyInstitution\n(Discovery)
+[-> issuer: select independent
+holder <- issuer: present assurance options
+opt Control of email
+    [-> issuer: choose self asserted
+    holder <-> issuer: form completion
+    note right
+        Eg: name, email.
+    end note
+    issuer -->] : email token
+    [-> issuer: verification
+else Identification credential 
+    [-> issuer: choose some credential
+    issuer -[lvc]> holder: credental options
+    note right
+        Must have identifier as appropprate
+        level of assurance. Driver's license?
+        Credit card number?
+        May collect residence (library use 
+        case).
+        May collect name, email (or use self
+        asserted attributes.) 
+    end note
+    holder -[lvc]> issuer: presentation
+end opt
+
+
+
+@enduml 
+
+@startuml 20240923dep
+!include ./color/color.puml
+
+component "Client" {
+    database Wallet {
+        card RandEstandard
+        card RandEblinded
+        card RandEbridge
+    }
+    
+}
+
+
+component "Home\ninstitution" as inst
+interface issuer as hi
+hi -- inst
+RandEstandard <-- hi
+
+component "Bridge\nservice"
+interface "verifier" as v 
+interface issuer
+v -- "Bridge\nservice" 
+RandEstandard --> v
+issuer -- "Bridge\nservice"
+RandEblinded <-- issuer
+RandEbridge <-- issuer
+
+inst  0)- "Bridge\nservice": OAuth
+inst -(0 "Bridge\nservice" : SCIM-ish
+
+component Resource
+'interface "HTTP" as rp 
+interface  verifier
+'rp -- Resource
+verifier -- Resource 
+RandEbridge --> verifier
+
+"Bridge\nservice" 0)- Resource: OAuth2\nGET /bridgeDocument/[tempID]
+
+component "Bridge\ntrust" as fed
+
+
+inst -(0- fed
+"Bridge\nservice" -(0- fed
+Resource -(0- fed
+
+'component "Virtual\ninstitution" as vo
+
+!include ./version.puml
+
+@enduml 
