@@ -20,5 +20,4 @@ Virtual organizations bootstrap their identities on other organization identitie
 
 The "Independent researcher by email" flow sketches a low assurance identity provisioning. The "Independent researcher by credential" flow sketches a high assurance  identity provisioning. Unclear what credentials offer a high assurance account recovery identifier.
 
-
 ![provisioning](./out/diagrams/20240923brainstorm/20240923seq.png)
